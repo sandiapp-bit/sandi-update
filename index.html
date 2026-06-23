@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>현장 담당자 사전 설문</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Apple SD Gothic Neo','Noto Sans KR',sans-serif;background:#f5f5f3;color:#1a1a1a;min-height:100vh}
+.wrap{max-width:600px;margin:0 auto;padding:2rem 1rem 4rem}
+.header{margin-bottom:2rem}
+.header h1{font-size:20px;font-weight:600;margin-bottom:4px}
+.header p{font-size:13px;color:#888}
+.progress-bar{height:3px;background:#e0e0e0;border-radius:2px;margin-bottom:2rem}
+.progress-fill{height:100%;border-radius:2px;background:#E0006F;transition:width 0.4s}
+.step{display:none}
+.step.active{display:block}
+.section-badge{display:inline-block;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;margin-bottom:1.25rem;background:#FFF0F7;color:#C0005A;letter-spacing:0.04em}
+.q-block{margin-bottom:1.75rem}
+.q-label{font-size:12px;font-weight:600;color:#aaa;margin-bottom:3px;letter-spacing:0.04em;display:flex;align-items:center;gap:6px}
+.required-badge{font-size:10px;font-weight:600;color:#e05c5c;background:#fff0f0;border:1px solid #f5c0c0;padding:1px 6px;border-radius:20px;letter-spacing:0}
+.q-text{font-size:16px;font-weight:500;color:#1a1a1a;margin-bottom:1rem;line-height:1.55}
+.options{display:flex;flex-direction:column;gap:8px}
+.opt{display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid #e0e0e0;border-radius:10px;cursor:pointer;background:#fff;transition:border-color 0.15s,background 0.15s}
+.opt:hover{background:#FFF0F7;border-color:#F9C0DC}
+.opt.selected{border-color:#E0006F;background:#FFF0F7}
+.opt input{width:16px;height:16px;accent-color:#E0006F;flex-shrink:0}
+.opt-label{font-size:15px;color:#1a1a1a}
+.text-input{width:100%;padding:12px 14px;border:1.5px solid #c8c8c8;border-radius:10px;font-size:15px;font-family:inherit;color:#1a1a1a;background:#fff;outline:none;transition:border-color 0.15s}
+.text-input:focus{border-color:#E0006F;border-width:2px}
+.text-input::placeholder{color:#bbb}
+textarea{width:100%;min-height:88px;padding:12px;border:1.5px solid #c8c8c8;border-radius:10px;font-size:15px;font-family:inherit;color:#1a1a1a;background:#fff;resize:vertical;line-height:1.6}
+textarea:focus{outline:none;border-color:#E0006F;border-width:2px}
+textarea::placeholder{color:#bbb}
+.etc-box{margin-top:8px;display:none}
+.etc-box textarea{min-height:60px;border:1.5px solid #c8c8c8}
+.branch-box{margin-top:1.25rem;padding:1.25rem;background:#f9f9f7;border-radius:12px;border:1px solid #e8e8e5}
+.branch-box .q-label{color:#bbb}
+.branch-box .q-text{font-size:14px}
+.divider{height:1px;background:#ebebeb;margin:1.75rem 0}
+.btn-row{display:flex;gap:8px;justify-content:flex-end;margin-top:2rem}
+button{padding:10px 22px;border-radius:10px;font-size:14px;font-weight:500;cursor:pointer;border:1px solid #ddd;background:#fff;color:#333;transition:background 0.15s;font-family:inherit}
+button:hover{background:#f5f5f5}
+button.primary{background:#E0006F;color:#fff;border-color:#E0006F}
+button.primary:hover{background:#B0005A}
+button:disabled{opacity:0.5;cursor:not-allowed}
+.err{font-size:12px;color:#e05c5c;margin-top:6px;display:none}
+.done-msg{text-align:center;padding:3rem 1rem}
+.done-icon{width:56px;height:56px;background:#FFF0F7;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.25rem;font-size:24px}
+.done-msg h2{font-size:20px;font-weight:600;margin-bottom:8px}
+.done-msg p{font-size:14px;color:#888;line-height:1.7}
+.review-box{margin-top:2rem;text-align:left;background:#f9f9f7;border:1px solid #e8e8e5;border-radius:12px;padding:1.25rem}
+.review-box h3{font-size:14px;font-weight:600;margin-bottom:1rem;color:#555}
+.review-row{display:flex;gap:8px;margin-bottom:8px;font-size:13px;line-height:1.5}
+.review-row .rk{color:#888;min-width:140px;flex-shrink:0}
+.review-row .rv{color:#1a1a1a;font-weight:500;word-break:break-all}
+.done-btns{display:flex;gap:8px;justify-content:center;margin-top:1.5rem;flex-wrap:wrap}
+
+/* ── 표지 스타일 ── */
+.cover{display:flex;flex-direction:column;min-height:80vh;justify-content:center}
+.cover-logo{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:#E0006F;background:#FFF0F7;border:1px solid #F9C0DC;border-radius:20px;padding:4px 12px;letter-spacing:0.06em;margin-bottom:2.5rem;width:fit-content}
+.cover-title{font-size:32px;font-weight:800;color:#1a1a1a;line-height:1.25;margin-bottom:1rem}
+.cover-title em{font-style:normal;color:#E0006F}
+.cover-subtitle{font-size:15px;color:#555;line-height:1.75;margin-bottom:2rem}
+.cover-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:2rem}
+.cover-card{background:#fff;border:1px solid #e8e8e5;border-radius:12px;padding:1rem 1.1rem}
+.cover-card.accent{background:#FFF0F7;border-color:#F9C0DC}
+.cover-card-title{font-size:12px;font-weight:700;color:#888;margin-bottom:8px;display:flex;align-items:center;gap:5px}
+.cover-card.accent .cover-card-title{color:#C0005A}
+.cover-card ul{padding:0;margin:0;list-style:none}
+.cover-card ul li{font-size:12.5px;color:#444;line-height:1.75;padding-left:12px;position:relative}
+.cover-card ul li::before{content:'·';position:absolute;left:0;color:#bbb}
+.cover-card.accent ul li::before{color:#E0006F}
+.cover-card.accent ul li{color:#333;font-weight:500}
+.cover-due{display:inline-flex;align-items:center;gap:8px;background:#fff;border:1px solid #e0e0e0;border-radius:10px;padding:8px 14px;margin-bottom:2rem;font-size:13px;color:#555}
+.cover-due .due-badge{background:#E0006F;color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:6px;letter-spacing:0.04em}
+.cover-meta{display:flex;gap:1.5rem;flex-wrap:wrap;margin-bottom:2.5rem}
+.cover-meta-item{display:flex;align-items:center;gap:6px;font-size:13px;color:#888}
+.cover-meta-item span.dot{width:6px;height:6px;border-radius:50%;background:#F9C0DC;flex-shrink:0}
+.cover-start-btn{width:100%;padding:16px;background:#1a1a1a;color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;transition:background 0.15s;display:flex;align-items:center;justify-content:center;gap:8px}
+.cover-start-btn:hover{background:#333}
+.cover-notice{font-size:12px;color:#bbb;text-align:center;margin-top:1rem;line-height:1.6}
+.cover-contact-btn{display:block;text-align:center;margin-top:1rem;padding:10px 16px;border:1px solid #F9C0DC;border-radius:10px;font-size:13px;color:#C0005A;background:#FFF0F7;text-decoration:none;font-weight:500;transition:background 0.15s}
+.cover-contact-btn:hover{background:#FFE0F0}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- 표지 -->
+  <div class="step active" id="s0">
+    <div class="cover">
+      <div class="cover-logo">✦ SANDI &nbsp;·&nbsp; 현장 담당자 설문</div>
+      <div class="cover-title">현장에서의 경험을<br><em>들려주세요</em></div>
+      <div class="cover-cards">
+        <div class="cover-card">
+          <div class="cover-card-title">📋 설문 목적</div>
+          <ul>
+            <li>현장 담당자의 샌디앱 활용 현황 파악 및 샌디앱 인수인계·교육 현황 파악을 통한 현장에 실질적으로 도움 되는 교육 체계 설계</li>
+          </ul>
+        </div>
+        <div class="cover-card accent">
+          <div class="cover-card-title">✦ 활용 방법</div>
+          <ul>
+            <li>인터뷰 사전 자료로 활용돼요</li>
+            <li>샌디앱 <strong>교육 및 인수인계 체계 개선</strong>에 직접 반영돼요</li>
+          </ul>
+        </div>
+      </div>
+      <div class="cover-meta">
+        <div class="cover-meta-item"><span class="dot"></span>소요 시간 약 5분</div>
+        <div class="cover-meta-item"><span class="dot"></span>총 3개 섹션</div>
+        <div class="cover-meta-item"><span class="dot"></span>응답 내용은 인터뷰 사전 자료로 활용됩니다</div>
+      </div>
+      <button class="cover-start-btn" onclick="startSurvey()">지금 시작하기 →</button>
+      <a href="https://forms.office.com/Pages/ResponsePage.aspx?id=ZFaGwLkcOEqLen2twu7UBQzL8TG-xo5JhWb0jgU9S4xUQTdaR0o1WUU3NFlIWURJSU1BVDUzVDZJOC4u" target="_blank" class="cover-contact-btn">응답에 어려움이 있으신가요? 담당자에게 문의하기 →</a>
+    </div>
+  </div>
+
+  <div class="progress-bar" id="progressBarWrap" style="display:none"><div class="progress-fill" id="prog" style="width:25%"></div></div>
+
+  <!-- STEP 1: 섹션 A · 기본 현황 -->
+  <div class="step" id="s1">
+    <div class="section-badge">섹션 A &nbsp;·&nbsp; 기본 현황</div>
+
+    <div class="q-block">
+      <div class="q-label">이름 <span class="required-badge">필수</span></div>
+      <div class="q-text">성함을 적어주세요.</div>
+      <input type="text" class="text-input" id="respondent_name" placeholder="홍길동"
+        onfocus="this.style.borderColor='#E0006F'" onblur="this.style.borderColor='#c8c8c8'">
+      <div class="err" id="err-name">이름을 입력해주세요.</div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="q-block">
+      <div class="q-label">현장명 <span class="required-badge">필수</span></div>
+      <div class="q-text">근무하시는 현장명을 적어주세요.</div>
+      <input type="text" class="text-input" id="site_name" placeholder="예) GS타워운영센터"
+        onfocus="this.style.borderColor='#E0006F'" onblur="this.style.borderColor='#c8c8c8'">
+      <div class="err" id="err-site">현장명을 입력해주세요.</div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="q-block">
+      <div class="q-label">Q1 <span class="required-badge">필수</span></div>
+      <div class="q-text">현장 근무 경력이 어떻게 되세요?</div>
+      <div class="options" id="opts-q1">
+        <label class="opt"><input type="radio" name="q1" value="3개월 미만"><span class="opt-label">3개월 미만</span></label>
+        <label class="opt"><input type="radio" name="q1" value="3~6개월"><span class="opt-label">3 ~ 6개월</span></label>
+        <label class="opt"><input type="radio" name="q1" value="6개월~2년"><span class="opt-label">6개월 ~ 2년</span></label>
+        <label class="opt"><input type="radio" name="q1" value="2년 이상"><span class="opt-label">2년 이상</span></label>
+      </div>
+      <div class="err" id="err-q1">답변을 선택해주세요.</div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="q-block">
+      <div class="q-label">Q2 <span class="required-badge">필수</span></div>
+      <div class="q-text">불편신고를 모바일로 처리한 경험이 있나요?</div>
+      <div class="options">
+        <label class="opt"><input type="radio" name="q2" value="Y" onchange="toggleSandi('Y')"><span class="opt-label">네, 있어요</span></label>
+        <label class="opt"><input type="radio" name="q2" value="N" onchange="toggleSandi('N')"><span class="opt-label">아니요, 없어요</span></label>
+      </div>
+      <div class="err" id="err-q2">답변을 선택해주세요.</div>
+
+      <div class="branch-box" id="sandiY" style="display:none">
+        <div class="q-label">Q2-1 · 경험 있음</div>
+        <div class="q-text">주로 어떤 기능을 사용하셨나요? <span style="font-size:12px;color:#aaa">(복수 선택 가능)</span></div>
+        <div class="options">
+          <label class="opt"><input type="checkbox" name="sandi_func" value="불편신고 확인"><span class="opt-label">불편신고 확인</span></label>
+          <label class="opt"><input type="checkbox" name="sandi_func" value="대여신청 확인"><span class="opt-label">대여신청 확인</span></label>
+          <label class="opt"><input type="checkbox" name="sandi_func" value="방문자 등록"><span class="opt-label">방문자 등록</span></label>
+          <label class="opt"><input type="checkbox" name="sandi_func" value="기타" onchange="toggleEtc('sandi_func_etc',this)"><span class="opt-label">기타</span></label>
+        </div>
+        <div class="etc-box" id="sandi_func_etc"><textarea placeholder="기타 내용을 적어주세요"></textarea></div>
+        <div style="margin-top:1rem">
+          <div class="q-label" style="margin-bottom:6px">Q2-2 · 사용하면서 불편했던 점이 있다면요?</div>
+          <textarea id="sandi_bad" placeholder="자유롭게 적어주세요"></textarea>
+        </div>
+      </div>
+
+      <div class="branch-box" id="sandiN" style="display:none">
+        <div class="q-label">Q2-1 · 경험 없음</div>
+        <div class="q-text">사용하지 않으신 이유가 있나요?</div>
+        <div class="options">
+          <label class="opt"><input type="radio" name="sandi_no_reason" value="존재를 몰랐음"><span class="opt-label">존재를 몰랐어요</span></label>
+          <label class="opt"><input type="radio" name="sandi_no_reason" value="사용법을 모름"><span class="opt-label">사용법을 몰라서요</span></label>
+          <label class="opt"><input type="radio" name="sandi_no_reason" value="업무에 필요 없었음"><span class="opt-label">업무에 필요 없었어요</span></label>
+          <label class="opt"><input type="radio" name="sandi_no_reason" value="기타" onchange="toggleEtc('sandi_no_reason_etc',this)"><span class="opt-label">기타</span></label>
+        </div>
+        <div class="etc-box" id="sandi_no_reason_etc"><textarea placeholder="기타 내용을 적어주세요"></textarea></div>
+      </div>
+    </div>
+
+    <div class="btn-row"><button class="primary" onclick="goStep(2)">다음 →</button></div>
+  </div>
+
+  <!-- STEP 2: 섹션 B · 인수인계 실태 -->
+  <div class="step" id="s2">
+    <div class="section-badge">섹션 B &nbsp;·&nbsp; 인수인계 실태</div>
+
+    <!-- Q3 -->
+    <div class="q-block">
+      <div class="q-label">Q3 <span class="required-badge">필수</span></div>
+      <div class="q-text">입사 후 업무 관련 <strong>샌디앱 인수인계</strong> 혹은 <strong>샌디앱 사용 교육</strong>을 받은 적이 있나요?</div>
+      <div class="options">
+        <label class="opt"><input type="radio" name="onboarding_yn" value="Y" onchange="toggleOnboarding('Y')"><span class="opt-label">네, 있어요</span></label>
+        <label class="opt"><input type="radio" name="onboarding_yn" value="N" onchange="toggleOnboarding('N')"><span class="opt-label">아니요, 없어요</span></label>
+      </div>
+      <div class="err" id="err-onboarding_yn">답변을 선택해주세요.</div>
+
+      <!-- Q3-1 (네) -->
+      <div class="branch-box" id="onboardingY" style="display:none">
+        <div class="q-label">Q3-1 · 샌디앱 인수인계·교육 경험 있음</div>
+        <div class="q-text">누구에게 샌디앱 인수인계 혹은 사용 교육을 받으셨나요? <span style="font-size:12px;color:#aaa">(복수 선택 가능)</span></div>
+        <div class="options">
+          <label class="opt"><input type="checkbox" name="onboarding_from" value="전임 담당자"><span class="opt-label">전임 담당자</span></label>
+          <label class="opt"><input type="checkbox" name="onboarding_from" value="동료 직원"><span class="opt-label">동료 직원</span></label>
+          <label class="opt"><input type="checkbox" name="onboarding_from" value="운영센터 관리자"><span class="opt-label">운영센터 관리자</span></label>
+          <label class="opt"><input type="checkbox" name="onboarding_from" value="본사 담당자"><span class="opt-label">본사 담당자</span></label>
+          <label class="opt"><input type="checkbox" name="onboarding_from" value="기타" onchange="toggleEtc('onboarding_from_etc',this)"><span class="opt-label">기타</span></label>
+        </div>
+        <div class="etc-box" id="onboarding_from_etc"><textarea placeholder="기타 내용을 적어주세요"></textarea></div>
+      </div>
+
+      <!-- Q3-N-1~3 (아니오) -->
+      <div class="branch-box" id="onboardingN" style="display:none">
+        <div class="q-label" style="margin-bottom:0.75rem">Q3-1 · 샌디앱 인수인계·교육 경험 없음</div>
+
+        <div class="q-text" style="font-size:14px;margin-bottom:0.75rem">샌디앱 사용 교육 없이 혼자 익히시는 데 어려움이 있었나요? <span class="required-badge">필수</span></div>
+        <div class="options" style="margin-bottom:0.5rem">
+          <label class="opt"><input type="radio" name="q3n1" value="매우 어려웠음"><span class="opt-label">네, 매우 어려웠어요</span></label>
+          <label class="opt"><input type="radio" name="q3n1" value="조금 어려웠음"><span class="opt-label">조금 어려웠어요</span></label>
+          <label class="opt"><input type="radio" name="q3n1" value="어렵지 않았음"><span class="opt-label">어렵지 않았어요</span></label>
+          <label class="opt"><input type="radio" name="q3n1" value="아직 샌디앱을 사용하지 않음"><span class="opt-label">아직 샌디앱을 사용하지 않아요</span></label>
+        </div>
+        <div class="err" id="err-q3n1">답변을 선택해주세요.</div>
+
+        <div class="q-text" style="font-size:14px;margin-bottom:0.75rem">샌디앱 인수인계나 사용 교육이 없었던 이유가 무엇이라고 생각하시나요? <span class="required-badge">필수</span></div>
+        <div class="options" style="margin-bottom:0.5rem">
+          <label class="opt"><input type="radio" name="q3n2" value="전임자 부재로 인수인계 불가"><span class="opt-label">전임자가 없어서 인수인계가 불가했어요</span></label>
+          <label class="opt"><input type="radio" name="q3n2" value="인수인계 문화 없음"><span class="opt-label">현장에 인수인계 문화 자체가 없어요</span></label>
+          <label class="opt"><input type="radio" name="q3n2" value="필요성 인식 부족"><span class="opt-label">샌디앱 교육의 필요성을 서로 인식하지 못했어요</span></label>
+          <label class="opt"><input type="radio" name="q3n2" value="모름"><span class="opt-label">잘 모르겠어요</span></label>
+        </div>
+        <div class="err" id="err-q3n2">답변을 선택해주세요.</div>
+
+        <div class="q-text" style="font-size:14px;margin-bottom:0.75rem">샌디앱 사용 교육이 처음부터 제공됐다면 도움이 됐을 것 같나요? <span class="required-badge">필수</span></div>
+        <div class="options">
+          <label class="opt"><input type="radio" name="q3n3" value="매우 도움됐을 것"><span class="opt-label">네, 많이 도움됐을 것 같아요</span></label>
+          <label class="opt"><input type="radio" name="q3n3" value="어느 정도 도움됐을 것"><span class="opt-label">어느 정도 도움됐을 것 같아요</span></label>
+          <label class="opt"><input type="radio" name="q3n3" value="별 차이 없었을 것"><span class="opt-label">별 차이 없었을 것 같아요</span></label>
+        </div>
+        <div class="err" id="err-q3n3">답변을 선택해주세요.</div>
+      </div>
+    </div>
+
+    <!-- Q4~Q9: Q3 '네'일 때만 표시 -->
+    <div id="q4to9" style="display:none">
+
+      <div class="divider"></div>
+
+      <div class="q-block">
+        <div class="q-label">Q4 <span class="required-badge">필수</span></div>
+        <div class="q-text">샌디앱 인수인계는 주로 어떤 방식으로 이루어졌나요? <span style="font-size:12px;color:#aaa">(복수 선택 가능)</span></div>
+        <div class="options">
+          <label class="opt"><input type="checkbox" name="handover" value="구두"><span class="opt-label">구두로 전달</span></label>
+          <label class="opt"><input type="checkbox" name="handover" value="문서"><span class="opt-label">문서로 정리</span></label>
+          <label class="opt"><input type="checkbox" name="handover" value="현장 동행"><span class="opt-label">현장 동행</span></label>
+          <label class="opt"><input type="checkbox" name="handover" value="없음"><span class="opt-label">별도 샌디앱 인수인계 없음</span></label>
+          <label class="opt"><input type="checkbox" name="handover" value="기타" onchange="toggleEtc('handover_etc',this)"><span class="opt-label">기타</span></label>
+        </div>
+        <div class="etc-box" id="handover_etc"><textarea placeholder="기타 내용을 적어주세요"></textarea></div>
+        <div class="err" id="err-handover">답변을 선택해주세요.</div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="q-block">
+        <div class="q-label">Q5 <span class="required-badge">필수</span></div>
+        <div class="q-text">샌디앱 인수인계에 보통 며칠이 걸렸나요?</div>
+        <div class="options">
+          <label class="opt"><input type="radio" name="handover_days" value="당일"><span class="opt-label">당일</span></label>
+          <label class="opt"><input type="radio" name="handover_days" value="1~3일"><span class="opt-label">1 ~ 3일</span></label>
+          <label class="opt"><input type="radio" name="handover_days" value="1주일 이내"><span class="opt-label">1주일 이내</span></label>
+          <label class="opt"><input type="radio" name="handover_days" value="1주일 이상"><span class="opt-label">1주일 이상</span></label>
+        </div>
+        <div class="err" id="err-handover_days">답변을 선택해주세요.</div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="q-block">
+        <div class="q-label">Q6</div>
+        <div class="q-text">샌디앱 인수인계 시 가장 어려운 점이 있었다면요?</div>
+        <textarea id="q6" placeholder="자유롭게 적어주세요"></textarea>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="q-block">
+        <div class="q-label">Q7 <span class="required-badge">필수</span></div>
+        <div class="q-text">샌디앱 인수인계 혹은 사용 교육 후, 샌디앱을 활용한 불편신고 대응에 어려움이 있었나요?</div>
+        <div class="options">
+          <label class="opt"><input type="radio" name="gap_freq" value="전혀 없었음"><span class="opt-label">전혀 없었어요</span></label>
+          <label class="opt"><input type="radio" name="gap_freq" value="가끔 있었음"><span class="opt-label">가끔 있었어요</span></label>
+          <label class="opt"><input type="radio" name="gap_freq" value="자주 있었음"><span class="opt-label">자주 있었어요</span></label>
+        </div>
+        <div class="err" id="err-gap_freq">답변을 선택해주세요.</div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="q-block">
+        <div class="q-label">Q8</div>
+        <div class="q-text">샌디앱 인수인계 혹은 사용 교육만으로 업무에 활용하는 것에 어려움이 있었다면, 어떤 부분이었는지 적어주세요.</div>
+        <textarea id="q8_detail" placeholder="예) 앱 실행은 됐는데 불편신고 접수 처리 방법을 몰라서 어려웠어요"></textarea>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="q-block">
+        <div class="q-label">Q9</div>
+        <div class="q-text">본인이 직접 다른 직원에게 샌디앱 인수인계 혹은 사용 교육을 진행한 적이 있다면, 어떻게 진행하셨나요?</div>
+        <textarea id="q9_teach" placeholder="예) 직접 옆에서 설명했어요 / 문서를 만들어서 전달했어요 / 진행한 적 없어요"></textarea>
+      </div>
+
+    </div><!-- /q4to9 -->
+
+    <div class="btn-row">
+      <button onclick="goStep(1)">← 이전</button>
+      <button class="primary" onclick="goStep(3)">다음 →</button>
+    </div>
+  </div>
+
+  <!-- STEP 3: 섹션 C · 교육 필요도 -->
+  <div class="step" id="s3">
+    <div class="section-badge">섹션 C &nbsp;·&nbsp; 교육 필요도</div>
+
+    <div class="q-block">
+      <div class="q-label">Q10</div>
+      <div class="q-text">신규 입사자에게 필수로 가르쳐야 한다고 생각하는 샌디앱 기능 3가지를 적어주세요.</div>
+      <div style="display:flex;flex-direction:column;gap:10px"><div style="display:flex;align-items:center;gap:10px"><span style="font-size:13px;font-weight:600;color:#E0006F;min-width:20px">1.</span><input type="text" class="text-input" id="q10_1" placeholder="예) 불편신고 접수 및 처리" onfocus="this.style.borderColor='#E0006F'" onblur="this.style.borderColor='#c8c8c8'"></div><div style="display:flex;align-items:center;gap:10px"><span style="font-size:13px;font-weight:600;color:#E0006F;min-width:20px">2.</span><input type="text" class="text-input" id="q10_2" placeholder="예) 대여신청 확인" onfocus="this.style.borderColor='#E0006F'" onblur="this.style.borderColor='#c8c8c8'"></div><div style="display:flex;align-items:center;gap:10px"><span style="font-size:13px;font-weight:600;color:#E0006F;min-width:20px">3.</span><input type="text" class="text-input" id="q10_3" placeholder="예) 방문자 등록" onfocus="this.style.borderColor='#E0006F'" onblur="this.style.borderColor='#c8c8c8'"></div></div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="q-block">
+      <div class="q-label">Q11 <span class="required-badge">필수</span></div>
+      <div class="q-text">샌디앱 사용 교육 혹은 샌디앱 인수인계를 추가적으로 받고 싶은 부분은? <span style="font-size:12px;color:#aaa">(복수 선택 가능)</span></div>
+      <div class="options">
+        <label class="opt"><input type="checkbox" name="edu_need" value="물품 대여"><span class="opt-label">물품 대여</span></label>
+        <label class="opt"><input type="checkbox" name="edu_need" value="고객 응대"><span class="opt-label">고객 응대</span></label>
+        <label class="opt"><input type="checkbox" name="edu_need" value="긴급상황 대처"><span class="opt-label">긴급상황 대처</span></label>
+        <label class="opt"><input type="checkbox" name="edu_need" value="PC 샌디 사용"><span class="opt-label">PC 샌디 사용</span></label>
+        <label class="opt"><input type="checkbox" name="edu_need" value="기타" onchange="toggleEtc('edu_need_etc',this)"><span class="opt-label">기타</span></label>
+      </div>
+      <div class="etc-box" id="edu_need_etc"><textarea placeholder="기타 내용을 적어주세요"></textarea></div>
+      <div class="err" id="err-edu_need">답변을 선택해주세요.</div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="q-block">
+      <div class="q-label">Q12 <span class="required-badge">필수</span></div>
+      <div class="q-text">교육을 받고 싶은 형태는?</div>
+      <div class="options">
+        <label class="opt"><input type="radio" name="edu_type" value="집합교육(본사)"><span class="opt-label">본사에 방문해서 다른 신입직원들과 함께 받는 집합교육</span></label>
+        <label class="opt"><input type="radio" name="edu_type" value="온라인 영상"><span class="opt-label">온라인 영상</span></label>
+        <label class="opt"><input type="radio" name="edu_type" value="현장 교육(운영센터)"><span class="opt-label">운영센터에 모여서 다같이 받는 현장 교육</span></label>
+        <label class="opt"><input type="radio" name="edu_type" value="매뉴얼 문서"><span class="opt-label">매뉴얼 문서</span></label>
+        <label class="opt"><input type="radio" name="edu_type" value="기타" onchange="toggleEtc('edu_type_etc',this)"><span class="opt-label">기타</span></label>
+      </div>
+      <div class="etc-box" id="edu_type_etc"><textarea placeholder="기타 내용을 적어주세요"></textarea></div>
+      <div class="err" id="err-edu_type">답변을 선택해주세요.</div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="q-block">
+      <div class="q-label">Q13</div>
+      <div class="q-text">앞으로 교육을 받는다면 꼭 포함되었으면 하는 내용이나 바라는 점이 있다면 적어주세요.</div>
+      <textarea id="q13" placeholder="자유롭게 적어주세요"></textarea>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="q-block">
+      <div class="q-label">Q14 <span class="required-badge">필수</span></div>
+      <div class="q-text">샌디앱 사용을 위해 본사의 교육 지원이 필요하다고 생각하시나요?</div>
+      <div class="options">
+        <label class="opt"><input type="radio" name="q14" value="매우 필요함" onchange="toggleEduSupport('Y')"><span class="opt-label">네, 꼭 필요해요</span></label>
+        <label class="opt"><input type="radio" name="q14" value="있으면 좋겠음" onchange="toggleEduSupport('Y')"><span class="opt-label">있으면 좋겠어요</span></label>
+        <label class="opt"><input type="radio" name="q14" value="잘 모르겠음" onchange="toggleEduSupport('N')"><span class="opt-label">잘 모르겠어요</span></label>
+        <label class="opt"><input type="radio" name="q14" value="필요 없음" onchange="toggleEduSupport('N')"><span class="opt-label">딱히 필요하지 않아요</span></label>
+      </div>
+      <div class="err" id="err-q14">답변을 선택해주세요.</div>
+
+      <div class="branch-box" id="eduSupportY" style="display:none">
+        <div class="q-label">Q14-1 · 교육 지원 필요</div>
+        <div class="q-text">본사에서 어떤 방식으로 지원해 주기를 바라시나요?</div>
+        <textarea id="edu_support_detail" placeholder="예) 현장 방문 교육, 영상 자료 배포, 정기 Q&A 등"></textarea>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button onclick="goStep(2)">← 이전</button>
+      <button class="primary" id="submitBtn" onclick="submitForm()">제출하기</button>
+    </div>
+  </div>
+
+  <!-- 완료 -->
+  <div class="step" id="done">
+    <div class="done-msg">
+      <div class="done-icon">✅</div>
+      <h2>설문이 완료됐습니다</h2>
+      <p>소중한 의견 감사해요.<br>인터뷰에서 더 이야기 나눠요!</p>
+      <div class="done-btns">
+        <button onclick="showReview()">제출 내역 확인</button>
+        <button class="primary" onclick="resubmit()">수정 후 재제출</button>
+      </div>
+      <div class="review-box" id="reviewBox" style="display:none">
+        <h3>제출 내역</h3>
+        <div id="reviewContent"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzV6rJkRumwYjBQh9KiPHmYpBgWajGn3DbTz2RZ_Tl_Hu0sQv82ksBD0nkdPBqM5zg1cQ/exec';
+const STEPS = 3;
+let cur = 0; // 0 = 표지
+let lastRow = null;
+
+/* ── 설문 시작 ── */
+function startSurvey() {
+  document.getElementById('s0').classList.remove('active');
+  document.getElementById('progressBarWrap').style.display = 'block';
+  cur = 1;
+  document.getElementById('s1').classList.add('active');
+  document.getElementById('prog').style.width = '25%';
+  window.scrollTo(0, 0);
+}
+
+/* ── 옵션 선택 스타일 ── */
+document.querySelectorAll('.opt input').forEach(inp => {
+  inp.addEventListener('change', () => {
+    if (inp.type === 'radio') {
+      document.querySelectorAll(`input[name="${inp.name}"]`).forEach(r => {
+        r.closest('.opt').classList.toggle('selected', r.checked);
+      });
+    } else {
+      inp.closest('.opt').classList.toggle('selected', inp.checked);
+    }
+    const errEl = document.getElementById('err-' + inp.name);
+    if (errEl) errEl.style.display = 'none';
+  });
+});
+
+/* ── 기타 텍스트박스 토글 ── */
+function toggleEtc(boxId, inp) {
+  const box = document.getElementById(boxId);
+  if (!box) return;
+  box.style.display = inp.checked ? 'block' : 'none';
+}
+
+/* ── 분기 토글 ── */
+function toggleSandi(v) {
+  document.getElementById('sandiY').style.display = v === 'Y' ? 'block' : 'none';
+  document.getElementById('sandiN').style.display = v === 'N' ? 'block' : 'none';
+}
+function toggleOnboarding(v) {
+  document.getElementById('onboardingY').style.display = v === 'Y' ? 'block' : 'none';
+  document.getElementById('onboardingN').style.display = v === 'N' ? 'block' : 'none';
+  document.getElementById('q4to9').style.display = v === 'Y' ? 'block' : 'none';
+  requiredByStep[2] = v === 'Y'
+    ? [
+        { name: 'onboarding_yn', type: 'radio' },
+        { name: 'handover', type: 'checkbox' },
+        { name: 'handover_days', type: 'radio' },
+        { name: 'gap_freq', type: 'radio' },
+      ]
+    : [
+        { name: 'onboarding_yn', type: 'radio' },
+        { name: 'q3n1', type: 'radio' },
+        { name: 'q3n2', type: 'radio' },
+        { name: 'q3n3', type: 'radio' },
+      ];
+}
+function toggleEduSupport(v) {
+  document.getElementById('eduSupportY').style.display = v === 'Y' ? 'block' : 'none';
+}
+
+/* ── 값 수집 ── */
+function getChecked(name) {
+  return [...document.querySelectorAll(`input[name="${name}"]:checked`)].map(i => i.value).join(', ');
+}
+function getVal(id) {
+  const el = document.getElementById(id);
+  return el ? el.value.trim() : '';
+}
+function getEtcVal(boxId) {
+  const box = document.getElementById(boxId);
+  if (!box || box.style.display === 'none') return '';
+  const ta = box.querySelector('textarea');
+  return ta ? ta.value.trim() : '';
+}
+
+/* ── 유효성 검사 ── */
+const requiredByStep = {
+  1: [
+    { name: 'q1', type: 'radio' },
+    { name: 'q2', type: 'radio' },
+  ],
+  2: [
+    { name: 'onboarding_yn', type: 'radio' },
+    { name: 'handover', type: 'checkbox' },
+    { name: 'handover_days', type: 'radio' },
+    { name: 'gap_freq', type: 'radio' },
+  ],
+  3: [
+    { name: 'edu_need', type: 'checkbox' },
+    { name: 'edu_type', type: 'radio' },
+    { name: 'q14', type: 'radio' },
+  ],
+};
+
+function validateStep(step) {
+  let valid = true;
+  if (step === 1) {
+    const nameEl = document.getElementById('respondent_name');
+    const nameErr = document.getElementById('err-name');
+    if (!nameEl.value.trim()) {
+      nameErr.style.display = 'block';
+      nameEl.style.borderColor = '#e05c5c';
+      valid = false;
+    } else {
+      nameErr.style.display = 'none';
+      nameEl.style.borderColor = '#c8c8c8';
+    }
+    const siteEl = document.getElementById('site_name');
+    const siteErr = document.getElementById('err-site');
+    if (!siteEl.value.trim()) {
+      siteErr.style.display = 'block';
+      siteEl.style.borderColor = '#e05c5c';
+      valid = false;
+    } else {
+      siteErr.style.display = 'none';
+      siteEl.style.borderColor = '#c8c8c8';
+    }
+  }
+  (requiredByStep[step] || []).forEach(({ name, type }) => {
+    const checked = document.querySelectorAll(`input[name="${name}"]:checked`).length > 0;
+    const errEl = document.getElementById('err-' + name);
+    if (!checked) {
+      if (errEl) errEl.style.display = 'block';
+      valid = false;
+    } else {
+      if (errEl) errEl.style.display = 'none';
+    }
+  });
+  if (!valid) {
+    const firstErr = document.querySelector('.err[style*="block"]');
+    if (firstErr) firstErr.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+  return valid;
+}
+
+/* ── 스텝 이동 ── */
+function goStep(n) {
+  if (n > cur && !validateStep(cur)) return;
+  document.getElementById('s' + cur).classList.remove('active');
+  cur = n;
+  document.getElementById('s' + cur).classList.add('active');
+  const pct = cur === 'done' ? 100 : Math.round(cur / STEPS * 100);
+  document.getElementById('prog').style.width = pct + '%';
+  window.scrollTo(0, 0);
+}
+
+/* ── 제출 ── */
+function buildRow() {
+  return {
+    timestamp: new Date().toLocaleString('ko-KR'),
+    이름: getVal('respondent_name'),
+    현장명: getVal('site_name'),
+    Q1_현장근무경력: getChecked('q1'),
+    Q2_불편신고모바일경험: getChecked('q2'),
+    Q2Y_주요기능: getChecked('sandi_func') + (getEtcVal('sandi_func_etc') ? ' / 기타: ' + getEtcVal('sandi_func_etc') : ''),
+    Q2Y_불편점: getVal('sandi_bad'),
+    Q2N_미사용이유: getChecked('sandi_no_reason') + (getEtcVal('sandi_no_reason_etc') ? ' / 기타: ' + getEtcVal('sandi_no_reason_etc') : ''),
+    Q3_인수인계교육여부: getChecked('onboarding_yn'),
+    Q3N_1_혼자익히기어려움: getChecked('q3n1'),
+    Q3N_2_교육없었던이유: getChecked('q3n2'),
+    Q3N_3_교육도움됐을것: getChecked('q3n3'),
+    Q3_1_교육받은대상: getChecked('onboarding_from') + (getEtcVal('onboarding_from_etc') ? ' / 기타: ' + getEtcVal('onboarding_from_etc') : ''),
+    Q4_인수인계방식: getChecked('handover') + (getEtcVal('handover_etc') ? ' / 기타: ' + getEtcVal('handover_etc') : ''),
+    Q5_인수인계기간: getChecked('handover_days'),
+    Q6_인수인계어려운점: getVal('q6'),
+    Q7_샌디앱활용어려움: getChecked('gap_freq'),
+    Q8_샌디앱활용어려운점상세: getVal('q8_detail'),
+    Q9_본인이교육진행경험: getVal('q9_teach'),
+    Q10_필수기능3가지: [getVal('q10_1'), getVal('q10_2'), getVal('q10_3')].filter(Boolean).map((v,i) => (i+1)+'. '+v).join(' / '),
+    Q11_추가교육필요분야: getChecked('edu_need') + (getEtcVal('edu_need_etc') ? ' / 기타: ' + getEtcVal('edu_need_etc') : ''),
+    Q12_선호교육형태: getChecked('edu_type') + (getEtcVal('edu_type_etc') ? ' / 기타: ' + getEtcVal('edu_type_etc') : ''),
+    Q13_바라는교육내용: getVal('q13'),
+    Q14_본사지원필요여부: getChecked('q14'),
+    Q14_1_본사지원방식: getVal('edu_support_detail'),
+  };
+}
+
+function sendRow(row, btn) {
+  const url = SCRIPT_URL + '?data=' + encodeURIComponent(JSON.stringify(row));
+  return fetch(url, { method: 'GET', mode: 'no-cors' })
+    .then(() => {})
+    .catch(() => {
+      if (btn) { btn.disabled = false; btn.textContent = '제출하기'; }
+      alert('제출 중 오류가 발생했어요. 다시 시도해주세요.');
+      throw new Error('fail');
+    });
+}
+
+function submitForm() {
+  if (!validateStep(3)) return;
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = '제출 중...';
+  lastRow = buildRow();
+  sendRow(lastRow, btn).then(() => {
+    document.getElementById('s3').classList.remove('active');
+    document.getElementById('done').classList.add('active');
+    document.getElementById('prog').style.width = '100%';
+  });
+}
+
+/* ── 제출 내역 확인 ── */
+const LABELS = {
+  timestamp:'제출 시각', 이름:'이름', 현장명:'현장명',
+  Q1_현장근무경력:'Q1 현장 근무 경력', Q2_불편신고모바일경험:'Q2 불편신고 모바일 경험',
+  Q2Y_주요기능:'Q2-1 주요 기능', Q2Y_불편점:'Q2-2 불편했던 점',
+  Q2N_미사용이유:'Q2-1 미사용 이유',
+  Q3_인수인계교육여부:'Q3 샌디앱 인수인계·교육 여부', Q3_1_교육받은대상:'Q3-1 교육 대상',
+  Q3N_1_혼자익히기어려움:'Q3-1 혼자 익히기 어려움', Q3N_2_교육없었던이유:'Q3-2 교육 없었던 이유', Q3N_3_교육도움됐을것:'Q3-3 교육 도움 여부',
+  Q4_인수인계방식:'Q4 인수인계 방식', Q5_인수인계기간:'Q5 인수인계 기간',
+  Q6_인수인계어려운점:'Q6 인수인계 어려운 점', Q7_샌디앱활용어려움:'Q7 샌디앱 활용 어려움',
+  Q8_샌디앱활용어려운점상세:'Q8 샌디앱 활용 어려운 점 상세', Q9_본인이교육진행경험:'Q9 본인 교육 진행 경험',
+  Q10_필수기능3가지:'Q10 필수 기능 3가지', Q11_추가교육필요분야:'Q11 추가 교육 필요 분야',
+  Q12_선호교육형태:'Q12 선호 교육 형태', Q13_바라는교육내용:'Q13 바라는 교육 내용',
+  Q14_본사지원필요여부:'Q14 본사 지원 필요 여부', Q14_1_본사지원방식:'Q14-1 본사 지원 방식',
+};
+
+function showReview() {
+  const box = document.getElementById('reviewBox');
+  const content = document.getElementById('reviewContent');
+  if (!lastRow) return;
+  content.innerHTML = Object.entries(lastRow)
+    .filter(([,v]) => v)
+    .map(([k,v]) => `<div class="review-row"><span class="rk">${LABELS[k]||k}</span><span class="rv">${v}</span></div>`)
+    .join('');
+  box.style.display = box.style.display === 'none' ? 'block' : 'none';
+}
+
+/* ── 수정 후 재제출 ── */
+function resubmit() {
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = false;
+  btn.textContent = '제출하기';
+  document.getElementById('done').classList.remove('active');
+  cur = 1;
+  document.getElementById('s1').classList.add('active');
+  document.getElementById('prog').style.width = '25%';
+  window.scrollTo(0, 0);
+}
+</script>
+</body>
+</html>
